@@ -28,18 +28,31 @@ namespace Bonsai.PointGrey
             while (running)
             {
                 camera.RetrieveBuffer(image);
-                image.Convert(FlyCapture2Managed.PixelFormat.PixelFormatBgr, convertedImage);
-
-                var bitmap = convertedImage.bitmap;
-                var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                try
+                if (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono8)
                 {
-                    var bitmapHeader = new IplImage(new CvSize(bitmap.Width, bitmap.Height), 8, 3, bitmapData.Scan0);
-                    var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.NumChannels);
-                    Core.cvCopy(bitmapHeader, output);
-                    Subject.OnNext(output);
+                    unsafe
+                    {
+                        var bitmapHeader = new IplImage(new CvSize((int)image.cols, (int)image.rows), 8, 1, new IntPtr(image.data));
+                        var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.NumChannels);
+                        Core.cvCopy(bitmapHeader, output);
+                        Subject.OnNext(output);
+                    }
                 }
-                finally { bitmap.UnlockBits(bitmapData); }
+                else
+                {
+                    image.Convert(FlyCapture2Managed.PixelFormat.PixelFormatBgr, convertedImage);
+
+                    var bitmap = convertedImage.bitmap;
+                    var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                    try
+                    {
+                        var bitmapHeader = new IplImage(new CvSize(bitmap.Width, bitmap.Height), 8, 3, bitmapData.Scan0);
+                        var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.NumChannels);
+                        Core.cvCopy(bitmapHeader, output);
+                        Subject.OnNext(output);
+                    }
+                    finally { bitmap.UnlockBits(bitmapData); }
+                }
             }
 
             camera.StopCapture();
