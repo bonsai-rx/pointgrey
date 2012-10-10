@@ -44,41 +44,51 @@ namespace Bonsai.PointGrey
 
         protected override IObservable<IplImage> Generate()
         {
-            return Observable.Using(
-                () =>
+            return Observable.Create<IplImage>(observer =>
+            {
+                var running = true;
+                var thread = new Thread(() =>
                 {
                     camera.StartCapture();
-                    return Disposable.Create(camera.StopCapture);
-                },
-                resource => ObservableCombinators.GenerateWithThread<IplImage>(observer =>
-                {
-                    camera.RetrieveBuffer(image);
-                    if (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono8)
+                    while (running)
                     {
-                        unsafe
+                        camera.RetrieveBuffer(image);
+                        if (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono8)
                         {
-                            var bitmapHeader = new IplImage(new CvSize((int)image.cols, (int)image.rows), 8, 1, new IntPtr(image.data));
-                            var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.NumChannels);
-                            Core.cvCopy(bitmapHeader, output);
-                            observer.OnNext(output);
+                            unsafe
+                            {
+                                var bitmapHeader = new IplImage(new CvSize((int)image.cols, (int)image.rows), 8, 1, new IntPtr(image.data));
+                                var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.NumChannels);
+                                Core.cvCopy(bitmapHeader, output);
+                                observer.OnNext(output);
+                            }
                         }
-                    }
-                    else
-                    {
-                        image.Convert(FlyCapture2Managed.PixelFormat.PixelFormatBgr, convertedImage);
+                        else
+                        {
+                            image.Convert(FlyCapture2Managed.PixelFormat.PixelFormatBgr, convertedImage);
 
-                        var bitmap = convertedImage.bitmap;
-                        var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                        try
-                        {
-                            var bitmapHeader = new IplImage(new CvSize(bitmap.Width, bitmap.Height), 8, 3, bitmapData.Scan0);
-                            var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.NumChannels);
-                            Core.cvCopy(bitmapHeader, output);
-                            observer.OnNext(output);
+                            var bitmap = convertedImage.bitmap;
+                            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                            try
+                            {
+                                var bitmapHeader = new IplImage(new CvSize(bitmap.Width, bitmap.Height), 8, 3, bitmapData.Scan0);
+                                var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.NumChannels);
+                                Core.cvCopy(bitmapHeader, output);
+                                observer.OnNext(output);
+                            }
+                            finally { bitmap.UnlockBits(bitmapData); }
                         }
-                        finally { bitmap.UnlockBits(bitmapData); }
                     }
-                }));
+                });
+
+                thread.Start();
+                return () =>
+                {
+                    running = false;
+                    if (thread != Thread.CurrentThread) thread.Join();
+                    camera.StopCapture();
+                };
+            });
         }
     }
 }
