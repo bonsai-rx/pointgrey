@@ -14,39 +14,25 @@ namespace Bonsai.PointGrey
 {
     public class FlyCapture : Source<IplImage>
     {
-        ManagedCamera camera;
-        ManagedImage image;
-        ManagedImage convertedImage;
+        IObservable<IplImage> source;
 
-        public int Index { get; set; }
-
-        public override IDisposable Load()
+        public FlyCapture()
         {
-            using (var manager = new ManagedBusManager())
+            source = Observable.Create<IplImage>(observer =>
             {
-                var guid = manager.GetCameraFromIndex((uint)Index);
-                camera = new ManagedCamera();
-                camera.Connect(guid);
-            }
+                ManagedCamera camera;
+                ManagedImage image;
+                ManagedImage convertedImage;
+                using (var manager = new ManagedBusManager())
+                {
+                    var guid = manager.GetCameraFromIndex((uint)Index);
+                    camera = new ManagedCamera();
+                    camera.Connect(guid);
+                }
 
-            image = new ManagedImage();
-            convertedImage = new ManagedImage();
-            return base.Load();
-        }
-
-        protected override void Unload()
-        {
-            convertedImage.Dispose();
-            image.Dispose();
-            camera.Disconnect();
-            base.Unload();
-        }
-
-        protected override IObservable<IplImage> Generate()
-        {
-            return Observable.Create<IplImage>(observer =>
-            {
                 var running = true;
+                image = new ManagedImage();
+                convertedImage = new ManagedImage();
                 var thread = new Thread(() =>
                 {
                     camera.StartCapture();
@@ -57,9 +43,9 @@ namespace Bonsai.PointGrey
                         {
                             unsafe
                             {
-                                var bitmapHeader = new IplImage(new CvSize((int)image.cols, (int)image.rows), 8, 1, new IntPtr(image.data));
-                                var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.NumChannels);
-                                Core.cvCopy(bitmapHeader, output);
+                                var bitmapHeader = new IplImage(new OpenCV.Net.Size((int)image.cols, (int)image.rows), IplDepth.U8, 1, new IntPtr(image.data));
+                                var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
+                                CV.Copy(bitmapHeader, output);
                                 observer.OnNext(output);
                             }
                         }
@@ -71,9 +57,9 @@ namespace Bonsai.PointGrey
                             var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
                             try
                             {
-                                var bitmapHeader = new IplImage(new CvSize(bitmap.Width, bitmap.Height), 8, 3, bitmapData.Scan0);
-                                var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.NumChannels);
-                                Core.cvCopy(bitmapHeader, output);
+                                var bitmapHeader = new IplImage(new OpenCV.Net.Size(bitmap.Width, bitmap.Height), IplDepth.U8, 3, bitmapData.Scan0);
+                                var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
+                                CV.Copy(bitmapHeader, output);
                                 observer.OnNext(output);
                             }
                             finally { bitmap.UnlockBits(bitmapData); }
@@ -87,8 +73,20 @@ namespace Bonsai.PointGrey
                     running = false;
                     if (thread != Thread.CurrentThread) thread.Join();
                     camera.StopCapture();
+                    convertedImage.Dispose();
+                    image.Dispose();
+                    camera.Disconnect();
                 };
-            });
+            })
+            .PublishReconnectable()
+            .RefCount();
+        }
+
+        public int Index { get; set; }
+
+        public override IObservable<IplImage> Generate()
+        {
+            return source;
         }
     }
 }
