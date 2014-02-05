@@ -16,7 +16,7 @@
     <tags>Bonsai PointGrey FlyCapture</tags>
     <dependencies>
       <dependency id="Bonsai.Core" version="2.0.0-rc1" />
-      <dependency id="OpenCV.Net" version="3.2.0" />
+      <dependency id="OpenCV.Net" version="3.2.1" />
     </dependencies>
   </metadata>
   <files>
