@@ -12,13 +12,13 @@ using System.Reactive.Disposables;
 
 namespace Bonsai.PointGrey
 {
-    public class FlyCapture : Source<IplImage>
+    public class FlyCapture : Source<FlyCaptureDataFrame>
     {
-        IObservable<IplImage> source;
+        IObservable<FlyCaptureDataFrame> source;
 
         public FlyCapture()
         {
-            source = Observable.Create<IplImage>(observer =>
+            source = Observable.Create<FlyCaptureDataFrame>(observer =>
             {
                 ManagedCamera camera;
                 ManagedImage image;
@@ -38,15 +38,15 @@ namespace Bonsai.PointGrey
                     camera.StartCapture();
                     while (running)
                     {
+                        IplImage output;
                         camera.RetrieveBuffer(image);
                         if (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono8)
                         {
                             unsafe
                             {
                                 var bitmapHeader = new IplImage(new OpenCV.Net.Size((int)image.cols, (int)image.rows), IplDepth.U8, 1, new IntPtr(image.data));
-                                var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
+                                output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
                                 CV.Copy(bitmapHeader, output);
-                                observer.OnNext(output);
                             }
                         }
                         else
@@ -58,12 +58,13 @@ namespace Bonsai.PointGrey
                             try
                             {
                                 var bitmapHeader = new IplImage(new OpenCV.Net.Size(bitmap.Width, bitmap.Height), IplDepth.U8, 3, bitmapData.Scan0);
-                                var output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
+                                output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
                                 CV.Copy(bitmapHeader, output);
-                                observer.OnNext(output);
                             }
                             finally { bitmap.UnlockBits(bitmapData); }
                         }
+
+                        observer.OnNext(new FlyCaptureDataFrame(output, image.imageMetadata));
                     }
                 });
 
@@ -84,7 +85,7 @@ namespace Bonsai.PointGrey
 
         public int Index { get; set; }
 
-        public override IObservable<IplImage> Generate()
+        public override IObservable<FlyCaptureDataFrame> Generate()
         {
             return source;
         }
