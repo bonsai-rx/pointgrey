@@ -1,0 +1,27 @@
+﻿using FlyCapture2Managed;
+using OpenCV.Net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Bonsai.PointGrey
+{
+    public class GpioPinState : Transform<ImageMetadata, Scalar>
+    {
+        public override IObservable<Scalar> Process(IObservable<ImageMetadata> source)
+        {
+            return source.Select(input =>
+            {
+                var gpio = input.embeddedGPIOPinState;
+                var gpio0 = ((gpio >> 31) & 0x1);
+                var gpio1 = ((gpio >> 30) & 0x1);
+                var gpio2 = ((gpio >> 29) & 0x1);
+                var gpio3 = ((gpio >> 28) & 0x1);
+                return new Scalar(gpio0, gpio1, gpio2, gpio3);
+            });
+        }
+    }
+}

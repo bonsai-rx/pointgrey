@@ -65,6 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FlyCapture.cs" />
+    <Compile Include="FlyCaptureDataFrame.cs" />
+    <Compile Include="GpioPinState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.Generated.cs" />
   </ItemGroup>
