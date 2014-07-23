@@ -14,10 +14,6 @@
     <releaseNotes>First public prerelease of the FlyCapture SDK interface for Bonsai.</releaseNotes>
     <copyright>Gonçalo Lopes © 2014</copyright>
     <tags>Bonsai PointGrey FlyCapture</tags>
-    <dependencies>
-      <dependency id="Bonsai.Core" version="2.0.0-rc1" />
-      <dependency id="OpenCV.Net" version="3.2.1" />
-    </dependencies>
   </metadata>
   <files>
     <file src="Bonsai.PointGrey.props" target="build\net45"/>
