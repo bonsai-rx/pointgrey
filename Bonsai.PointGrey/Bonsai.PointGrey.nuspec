@@ -11,7 +11,6 @@
     <iconUrl>https://bitbucket.org/horizongir/bonsai/raw/7aacc64dc4647e57362ab310238591dc197fef0d/Resources/Bonsai.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>First public prerelease of the FlyCapture SDK interface for Bonsai.</releaseNotes>
     <copyright>Gonçalo Lopes © 2014</copyright>
     <tags>Bonsai PointGrey FlyCapture</tags>
   </metadata>
