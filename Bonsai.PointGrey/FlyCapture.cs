@@ -40,11 +40,13 @@ namespace Bonsai.PointGrey
                     {
                         IplImage output;
                         camera.RetrieveBuffer(image);
-                        if (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono8)
+                        if (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono8 ||
+                            image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono16)
                         {
                             unsafe
                             {
-                                var bitmapHeader = new IplImage(new OpenCV.Net.Size((int)image.cols, (int)image.rows), IplDepth.U8, 1, new IntPtr(image.data));
+                                var depth = image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono16 ? IplDepth.U16 : IplDepth.U8;
+                                var bitmapHeader = new IplImage(new OpenCV.Net.Size((int)image.cols, (int)image.rows), depth, 1, new IntPtr(image.data));
                                 output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
                                 CV.Copy(bitmapHeader, output);
                             }
