@@ -1,4 +1,4 @@
-Copyright (C) 2015 Gon√ßalo C. Lopes
+Copyright (C) 2015 GonÁalo Lopes
 
 In addition to the MIT license terms expressed in the following, this software
 is subject to the terms of the Point Grey FlyCapture Software Development Kit
@@ -26,14 +26,14 @@ SOFTWARE.
 This software integrates and makes use of the Point Grey FlyCapture Software
 Development Kit, which is subject to the following license agreement:
 
-PGR FlyCapture¬Æ SDK License Agreement
+PGR FlyCaptureÆ SDK License Agreement
 
 READ CAREFULLY: This is a legal agreement between you (an individual or a single entity)
-(‚Äúyou‚Äù) and Point Grey Research, Inc. (‚ÄúPGR‚Äù). Before installing and using the FlyCapture¬Æ
+(ìyouî) and Point Grey Research, Inc. (ìPGRî). Before installing and using the FlyCaptureÆ
 Software Development Kit and any updates to it that we may at our discretion provide to you
 (collectively, the "SDK"), you should read this agreement. If you do not agree with all of the terms
 of this agreement, do not install or use the SDK. PGR may change this agreement at any time and
-it is your responsibility to review the most updated version of it on PGR‚Äôs website at
+it is your responsibility to review the most updated version of it on PGRís website at
 http://www.ptgrey.com/flycapture-sdk. By continuing to use the SDK following such changes, you
 agree to be bound by them.
 
@@ -58,8 +58,8 @@ rights in the SDK to any third party; or (e) remove, alter or obscure any propri
 4. Additional OEM Rights: If you are an original equipment manufacturer, then in addition to the
 rights set out in Section 1 above you are hereby granted a limited, terminable, non-transferable, nonexclusive
 license and right to use the SDK for the sole additional purpose of incorporating the libraries
-found in the SDK (collectively, the ‚ÄúLibraries‚Äù) into new products developed by you, in whole or in part,
-using the SDK (collectively, the ‚ÄúDerivative Products‚Äù) provided that you: (a) ensure that the
+found in the SDK (collectively, the ìLibrariesî) into new products developed by you, in whole or in part,
+using the SDK (collectively, the ìDerivative Productsî) provided that you: (a) ensure that the
 components of any Derivative Product that derive functionality from any of the Libraries may only be used
 with PGR products, including the SDK, and images derived from such products; (b) may only redistribute
 drivers (.inf and .sys), dynamically linked libraries (.dlls and .so), executables (.exe) and documentation
@@ -77,13 +77,13 @@ in any trade-marks of PGR. All rights not explicitly granted herein are hereby r
 
 6. Indemnification: You assume the entire risk relating to, and will indemnify, hold harmless and
 defend PGR from and against any claims, actions, lawsuits, or proceedings, and any losses, liabilities,
-damages and expenses (including attorney‚Äôs fees and expenses) that arise or result from your activities
+damages and expenses (including attorneyís fees and expenses) that arise or result from your activities
 under this agreement, including the distribution or use of the SDK (including the Libraries) and/or the
 development, distribution or use of any Derivative Product (including any intellectual property
 infringement claims relating thereto).
 
-7. No Warranties: Your use of the SDK is solely at your own risk. The SDK is provided ‚Äúas is‚Äù and
-‚Äúas available‚Äù without warranty or condition of any kind, either express, implied or statutory, including
+7. No Warranties: Your use of the SDK is solely at your own risk. The SDK is provided ìas isî and
+ìas availableî without warranty or condition of any kind, either express, implied or statutory, including
 implied warranties of merchantability, fitness for a particular application or purpose, title and noninfringement,
 and PGR hereby expressly disclaims all such warranties and conditions. Some jurisdictions
 do not allow the exclusion of implied warranties, so the above exclusion may not apply to you.
@@ -101,7 +101,7 @@ under this agreement or otherwise exceed $25.
 services related to the SDK for such period of time as PGR at its sole discretion elects. PGR may change
 or cease to provide the SDK and the limited Support at any time and from time to time without notice to
 you and that PGR is not obligated to provide the SDK or any support. PGR may use any technical
-information, feedback or ideas you provide to PGR for PGR‚Äôs business purposes, including product
+information, feedback or ideas you provide to PGR for PGRís business purposes, including product
 support and development.
 
 10. Termination: PGR may terminate this agreement immediately on notice to you if you violate any
@@ -115,7 +115,7 @@ result of the violation or default. Sections 6-8, 10 and 12 will survive any ter
 11. Export Laws: This agreement involves products and/or technical data that may be controlled
 under laws and regulations of the United States and other countries, including the United States Export
 Administration Regulations, or any other applicable law, regulation, rule, guideline or order (collectively,
-‚ÄúExport Laws‚Äù). You will comply with all Export Laws to ensure that the SDK is not exported, directly or
+ìExport Lawsî). You will comply with all Export Laws to ensure that the SDK is not exported, directly or
 indirectly, in contravention of the Export Laws. You represent and warrant to PGR that you are not a
 person barred from receiving the SDK under any Export Laws.
 
@@ -124,7 +124,7 @@ subject matter of this agreement. If you are signing on behalf of an entity such
 represent and warrant that you have the authority to bind such entity. This agreement and the rights
 granted hereunder are personal to you and you may not assign this agreement to a third party without the
 prior written consent of PGR. This agreement is governed exclusively by and will be enforced, construed,
-and interpreted exclusively in accordance with the laws of British Columbia (‚ÄúBC‚Äù) and the laws of
+and interpreted exclusively in accordance with the laws of British Columbia (ìBCî) and the laws of
 Canada applicable in BC. The courts of the Province of BC will have exclusive jurisdiction over any
 dispute arising under this agreement. You agree that termination and/or monetary damages may not be
 a sufficient remedy if you breach this agreement and that PGR will be entitled, without waiving any other
