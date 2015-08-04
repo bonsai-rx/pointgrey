@@ -41,7 +41,9 @@ namespace Bonsai.PointGrey
                         IplImage output;
                         camera.RetrieveBuffer(image);
                         if (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono8 ||
-                            image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono16)
+                            image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono16 ||
+                            (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatRaw8 &&
+                             image.bayerTileFormat == BayerTileFormat.None))
                         {
                             unsafe
                             {
