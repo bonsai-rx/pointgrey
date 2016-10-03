@@ -37,6 +37,7 @@ namespace Bonsai.PointGrey
                     while (running)
                     {
                         IplImage output;
+                        BayerTileFormat bayerTileFormat;
                         camera.RetrieveBuffer(image);
                         if (image.pixelFormat == PixelFormat.PixelFormatMono8 ||
                             image.pixelFormat == PixelFormat.PixelFormatMono16 ||
@@ -46,6 +47,7 @@ namespace Bonsai.PointGrey
                         {
                             unsafe
                             {
+                                bayerTileFormat = image.bayerTileFormat;
                                 var depth = image.pixelFormat == PixelFormat.PixelFormatMono16 ? IplDepth.U16 : IplDepth.U8;
                                 var bitmapHeader = new IplImage(new Size((int)image.cols, (int)image.rows), depth, 1, new IntPtr(image.data));
                                 output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
@@ -56,6 +58,7 @@ namespace Bonsai.PointGrey
                         {
                             unsafe
                             {
+                                bayerTileFormat = BayerTileFormat.None;
                                 output = new IplImage(new Size((int)image.cols, (int)image.rows), IplDepth.U8, 3);
                                 using (var convertedImage = new ManagedImage(
                                     (uint)output.Height,
@@ -71,7 +74,7 @@ namespace Bonsai.PointGrey
                             }
                         }
 
-                        observer.OnNext(new FlyCaptureDataFrame(output, image.imageMetadata));
+                        observer.OnNext(new FlyCaptureDataFrame(output, image.imageMetadata, bayerTileFormat));
                     }
                 });
 
