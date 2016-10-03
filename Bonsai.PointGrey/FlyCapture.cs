@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using OpenCV.Net;
 using FlyCapture2Managed;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Threading;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
@@ -18,11 +16,11 @@ namespace Bonsai.PointGrey
 
         public FlyCapture()
         {
+            ColorProcessing = ColorProcessingAlgorithm.Default;
             source = Observable.Create<FlyCaptureDataFrame>(observer =>
             {
                 ManagedCamera camera;
                 ManagedImage image;
-                ManagedImage convertedImage;
                 using (var manager = new ManagedBusManager())
                 {
                     var guid = manager.GetCameraFromIndex((uint)Index);
@@ -31,8 +29,8 @@ namespace Bonsai.PointGrey
                 }
 
                 var running = true;
+                var colorProcessing = ColorProcessing;
                 image = new ManagedImage();
-                convertedImage = new ManagedImage();
                 var thread = new Thread(() =>
                 {
                     camera.StartCapture();
@@ -40,32 +38,37 @@ namespace Bonsai.PointGrey
                     {
                         IplImage output;
                         camera.RetrieveBuffer(image);
-                        if (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono8 ||
-                            image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono16 ||
-                            (image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatRaw8 &&
-                             image.bayerTileFormat == BayerTileFormat.None))
+                        if (image.pixelFormat == PixelFormat.PixelFormatMono8 ||
+                            image.pixelFormat == PixelFormat.PixelFormatMono16 ||
+                            (image.pixelFormat == PixelFormat.PixelFormatRaw8 &&
+                               (image.bayerTileFormat == BayerTileFormat.None ||
+                                colorProcessing == ColorProcessingAlgorithm.NoColorProcessing)))
                         {
                             unsafe
                             {
-                                var depth = image.pixelFormat == FlyCapture2Managed.PixelFormat.PixelFormatMono16 ? IplDepth.U16 : IplDepth.U8;
-                                var bitmapHeader = new IplImage(new OpenCV.Net.Size((int)image.cols, (int)image.rows), depth, 1, new IntPtr(image.data));
+                                var depth = image.pixelFormat == PixelFormat.PixelFormatMono16 ? IplDepth.U16 : IplDepth.U8;
+                                var bitmapHeader = new IplImage(new Size((int)image.cols, (int)image.rows), depth, 1, new IntPtr(image.data));
                                 output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
                                 CV.Copy(bitmapHeader, output);
                             }
                         }
                         else
                         {
-                            image.Convert(FlyCapture2Managed.PixelFormat.PixelFormatBgr, convertedImage);
-
-                            var bitmap = convertedImage.bitmap;
-                            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                            try
+                            unsafe
                             {
-                                var bitmapHeader = new IplImage(new OpenCV.Net.Size(bitmap.Width, bitmap.Height), IplDepth.U8, 3, bitmapData.Scan0);
-                                output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
-                                CV.Copy(bitmapHeader, output);
+                                output = new IplImage(new Size((int)image.cols, (int)image.rows), IplDepth.U8, 3);
+                                using (var convertedImage = new ManagedImage(
+                                    (uint)output.Height,
+                                    (uint)output.Width,
+                                    (uint)output.WidthStep,
+                                    (byte*)output.ImageData.ToPointer(),
+                                    (uint)(output.WidthStep * output.Height),
+                                    PixelFormat.PixelFormatBgr))
+                                {
+                                    convertedImage.colorProcessingAlgorithm = colorProcessing;
+                                    image.Convert(PixelFormat.PixelFormatBgr, convertedImage);
+                                }
                             }
-                            finally { bitmap.UnlockBits(bitmapData); }
                         }
 
                         observer.OnNext(new FlyCaptureDataFrame(output, image.imageMetadata));
@@ -78,7 +81,6 @@ namespace Bonsai.PointGrey
                     running = false;
                     if (thread != Thread.CurrentThread) thread.Join();
                     camera.StopCapture();
-                    convertedImage.Dispose();
                     image.Dispose();
                     camera.Disconnect();
                 };
@@ -88,6 +90,8 @@ namespace Bonsai.PointGrey
         }
 
         public int Index { get; set; }
+
+        public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
         public override IObservable<FlyCaptureDataFrame> Generate()
         {
