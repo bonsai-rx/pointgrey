@@ -27,5 +27,10 @@ namespace Bonsai.PointGrey
         public ImageMetadata Metadata { get; private set; }
 
         public BayerTileFormat BayerTileFormat { get; private set; }
+
+        public override string ToString()
+        {
+            return string.Format("{{Image={0}, Bayer={1}}}", Image, BayerTileFormat);
+        }
     }
 }
