@@ -6,12 +6,12 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://bitbucket.org/horizongir/bonsai.experimental/raw/330594d70e2e3ad09e9545ae5d12cb124ac31535/Bonsai.PointGrey/LICENSE</licenseUrl>
-    <projectUrl>https://bitbucket.org/horizongir/bonsai</projectUrl>
+    <licenseUrl>https://bitbucket.org/horizongir/bonsai.pointgrey/raw/262bcdfa7ad80861addbd5f1197b6f973845747c/LICENSE</licenseUrl>
+    <projectUrl>https://bitbucket.org/horizongir/bonsai.pointgrey</projectUrl>
     <iconUrl>https://bitbucket.org/horizongir/bonsai/raw/7aacc64dc4647e57362ab310238591dc197fef0d/Resources/Bonsai.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>Gonçalo Lopes © 2015</copyright>
+    <copyright>Gonçalo Lopes © 2017</copyright>
     <tags>Bonsai PointGrey FlyCapture</tags>
   </metadata>
   <files>
