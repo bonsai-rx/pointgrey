@@ -33,17 +33,30 @@ namespace Bonsai.PointGrey
                             camera.Connect(guid);
                         }
 
+                        var capture = 0;
                         try
                         {
                             var colorProcessing = ColorProcessing;
                             using (var image = new ManagedImage())
+                            using (var notification = cancellationToken.Register(() =>
+                            {
+                                Interlocked.Exchange(ref capture, 0);
+                                camera.StopCapture();
+                            }))
                             {
                                 camera.StartCapture();
+                                Interlocked.Exchange(ref capture, 1);
                                 while (!cancellationToken.IsCancellationRequested)
                                 {
                                     IplImage output;
                                     BayerTileFormat bayerTileFormat;
-                                    camera.RetrieveBuffer(image);
+                                    try { camera.RetrieveBuffer(image); }
+                                    catch (FC2Exception)
+                                    {
+                                        if (capture == 0) break;
+                                        else throw;
+                                    }
+
                                     if (image.pixelFormat == PixelFormat.PixelFormatMono8 ||
                                         image.pixelFormat == PixelFormat.PixelFormatMono16 ||
                                         (image.pixelFormat == PixelFormat.PixelFormatRaw8 &&
@@ -85,7 +98,7 @@ namespace Bonsai.PointGrey
                         }
                         finally
                         {
-                            camera.StopCapture();
+                            if (capture != 0) camera.StopCapture();
                             camera.Disconnect();
                             camera.Dispose();
                         }
