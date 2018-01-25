@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Gonçalo Lopes")]
 [assembly: AssemblyProduct("Bonsai.PointGrey")]
-[assembly: AssemblyCopyright("Copyright © Gonçalo Lopes 2012-2014")]
+[assembly: AssemblyCopyright("Copyright © Gonçalo Lopes 2012-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -34,4 +34,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.3.0.0")]
 [assembly: AssemblyFileVersion("2.3.0.0")]
-[assembly: AssemblyInformationalVersion("2.3.0")]
+[assembly: AssemblyInformationalVersion("2.3.1")]
