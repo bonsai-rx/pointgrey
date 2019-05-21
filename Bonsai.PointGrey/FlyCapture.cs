@@ -57,16 +57,17 @@ namespace Bonsai.PointGrey
                                         else throw;
                                     }
 
+                                    var raw16 = image.pixelFormat == PixelFormat.PixelFormatRaw16;
                                     if (image.pixelFormat == PixelFormat.PixelFormatMono8 ||
                                         image.pixelFormat == PixelFormat.PixelFormatMono16 ||
-                                        (image.pixelFormat == PixelFormat.PixelFormatRaw8 &&
-                                           (image.bayerTileFormat == BayerTileFormat.None ||
-                                            colorProcessing == ColorProcessingAlgorithm.NoColorProcessing)))
+                                        ((image.pixelFormat == PixelFormat.PixelFormatRaw8 || raw16) &&
+                                         (image.bayerTileFormat == BayerTileFormat.None ||
+                                          colorProcessing == ColorProcessingAlgorithm.NoColorProcessing)))
                                     {
                                         unsafe
                                         {
                                             bayerTileFormat = image.bayerTileFormat;
-                                            var depth = image.pixelFormat == PixelFormat.PixelFormatMono16 ? IplDepth.U16 : IplDepth.U8;
+                                            var depth = image.pixelFormat == PixelFormat.PixelFormatMono16 || raw16 ? IplDepth.U16 : IplDepth.U8;
                                             var bitmapHeader = new IplImage(new Size((int)image.cols, (int)image.rows), depth, 1, new IntPtr(image.data));
                                             output = new IplImage(bitmapHeader.Size, bitmapHeader.Depth, bitmapHeader.Channels);
                                             CV.Copy(bitmapHeader, output);
@@ -77,17 +78,19 @@ namespace Bonsai.PointGrey
                                         unsafe
                                         {
                                             bayerTileFormat = BayerTileFormat.None;
-                                            output = new IplImage(new Size((int)image.cols, (int)image.rows), IplDepth.U8, 3);
+                                            var depth = raw16 ? IplDepth.U16 : IplDepth.U8;
+                                            var format = raw16 ? PixelFormat.PixelFormatBgr16 : PixelFormat.PixelFormatBgr;
+                                            output = new IplImage(new Size((int)image.cols, (int)image.rows), depth, 3);
                                             using (var convertedImage = new ManagedImage(
                                                 (uint)output.Height,
                                                 (uint)output.Width,
                                                 (uint)output.WidthStep,
                                                 (byte*)output.ImageData.ToPointer(),
                                                 (uint)(output.WidthStep * output.Height),
-                                                PixelFormat.PixelFormatBgr))
+                                                format))
                                             {
                                                 convertedImage.colorProcessingAlgorithm = colorProcessing;
-                                                image.Convert(PixelFormat.PixelFormatBgr, convertedImage);
+                                                image.Convert(format, convertedImage);
                                             }
                                         }
                                     }
