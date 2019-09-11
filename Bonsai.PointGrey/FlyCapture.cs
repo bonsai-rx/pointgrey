@@ -18,6 +18,8 @@ namespace Bonsai.PointGrey
 
         public FlyCapture()
         {
+            NumBuffers = 10;
+            GrabMode = GrabMode.BufferFrames;
             ColorProcessing = ColorProcessingAlgorithm.Default;
             source = Observable.Create<FlyCaptureDataFrame>((observer, cancellationToken) =>
             {
@@ -34,6 +36,13 @@ namespace Bonsai.PointGrey
                         }
 
                         var capture = 0;
+                        var numBuffers = NumBuffers;
+                        var config = camera.GetConfiguration();
+                        config.grabMode = GrabMode;
+                        config.numBuffers = (uint)NumBuffers;
+                        config.highPerformanceRetrieveBuffer = true;
+                        camera.SetConfiguration(config);
+
                         try
                         {
                             var colorProcessing = ColorProcessing;
@@ -118,6 +127,10 @@ namespace Bonsai.PointGrey
         public int Index { get; set; }
 
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
+
+        public int NumBuffers { get; set; }
+
+        public GrabMode GrabMode { get; set; }
 
         public override IObservable<FlyCaptureDataFrame> Generate()
         {
