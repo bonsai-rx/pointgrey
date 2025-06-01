@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <PackageTags>Bonsai Rx PointGrey FlyCapture</PackageTags>
+    <PackageProjectUrl>https://bonsai-rx.org/pointgrey</PackageProjectUrl>
+
+    <Authors>Bonsai Foundation</Authors>
+    <Copyright>Copyright © Bonsai Foundation CIC and Contributors</Copyright>
+
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+</Project>
